@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { FaFacebookF, FaInstagram, FaYoutube } from 'react-icons/fa';
 import { useLang } from '../context/LangContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Footer() {
   const { t } = useLang();
+  const { isAuthenticated } = useAuth();
   return (
     <footer className="bg-ink text-white/80 mt-20">
       <div className="container-shop py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
@@ -54,8 +56,18 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10 py-5 text-center text-xs text-white/40">
-        © {new Date().getFullYear()} साज by Anita Jewellery. All rights reserved.
+      <div className="border-t border-white/10 py-5 text-xs text-white/40">
+        <div className="container-shop flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-center sm:text-left">
+            © {new Date().getFullYear()} साज by Anita Jewellery. All rights reserved.
+          </p>
+          <Link
+            to={isAuthenticated ? "/admin/dashboard" : "/admin/login"}
+            className="border border-gold/30 hover:border-gold/80 text-gold/80 hover:text-gold transition-colors px-4 py-1.5 rounded-full font-medium tracking-wide whitespace-nowrap"
+          >
+            {isAuthenticated ? "Go to Admin Dashboard" : "Admin Login"}
+          </Link>
+        </div>
       </div>
     </footer>
   );

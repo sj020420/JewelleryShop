@@ -3,7 +3,7 @@ import { FaTachometerAlt, FaGem, FaTags, FaSignOutAlt } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 
 const links = [
-  { to: '/admin', icon: FaTachometerAlt, label: 'Dashboard', end: true },
+  { to: '/admin/dashboard', icon: FaTachometerAlt, label: 'Dashboard', end: true },
   { to: '/admin/products', icon: FaGem, label: 'Products' },
   { to: '/admin/categories', icon: FaTags, label: 'Categories' },
 ];

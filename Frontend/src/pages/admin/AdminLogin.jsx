@@ -15,7 +15,7 @@ export default function AdminLogin() {
     setLoading(true);
     try {
       await login(email, password);
-      navigate('/admin');
+      navigate('/admin/dashboard');
     } catch {
       toast.error('Invalid email or password.');
     } finally {
