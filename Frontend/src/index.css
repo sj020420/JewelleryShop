@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Signature chain-divider, echoing the beaded chain in the logo */
+.chain-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 auto;
+}
+.chain-divider span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #D4AF37;
+}
+.chain-divider span:nth-child(1) { width: 3px; height: 3px; opacity: 0.5; }
+.chain-divider span:nth-child(5) { width: 3px; height: 3px; opacity: 0.5; }
+.chain-divider::before,
+.chain-divider::after {
+  content: '';
+  height: 1px;
+  width: 40px;
+  background: linear-gradient(90deg, transparent, #D4AF37);
+}
+.chain-divider::after {
+  background: linear-gradient(90deg, #D4AF37, transparent);
+}
+
+.text-shimmer {
+  background: linear-gradient(90deg, #9C7B22 0%, #E8CE7A 25%, #D4AF37 50%, #E8CE7A 75%, #9C7B22 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Focus visibility for accessibility */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid #D4AF37;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.container-shop {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+@media (min-width: 1024px) {
+  .container-shop { padding-left: 2rem; padding-right: 2rem; }
+}
