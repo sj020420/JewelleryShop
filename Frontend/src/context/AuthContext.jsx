@@ -1,9 +1,9 @@
 import { createContext, useContext, useState } from 'react';
-import api from '../api/axios'; // तुमच्या फाईलनुसार योग्य पाथ
+import api from '../api/axios';
 
 const AuthContext = createContext(null);
 
-// 🔐 लोकल टोकन जनरेशन लॉजिक (बॅकएंड डाऊन असेल तरी फ्रंटएंड लॉगिन चालू ठेवण्यासाठी)
+// 🔐 लोकल टोकन जनरेशन लॉजिक
 async function generateLocalJWT(email, role, adminId = 1) {
   const secret = 'Anita_Jewellery_2026';
   const header = { alg: 'HS256', typ: 'JWT' };
@@ -73,8 +73,8 @@ export function AuthProvider({ children }) {
   // 🚀 लॉगिन फंक्शन
   async function login(email, password) {
     try {
-      // 1. थेट बॅकएंडला हिट करा (सर्वोत्तम मार्ग)
-      const { data } = await api.post('/auth/login', { email, password });
+      // 1. थेट बॅकएंडला हिट करा (✅ दुरुस्त केलेला पाथ: /api/auth/login)
+      const { data } = await api.post('/api/auth/login', { email, password });
       localStorage.setItem('sajAdminToken', data.token);
       localStorage.setItem('sajAdmin', JSON.stringify(data.admin));
       setAdmin(data.admin);
@@ -82,15 +82,14 @@ export function AuthProvider({ children }) {
     } catch (err) {
       console.warn("Backend login failed, trying fallbacks...", err);
 
-      // 2. जर लॉगिन करणारा युजर 'swapnil@gmail.com' किंवा 'sj020420@gmail.com' असेल तर फॉलबॅक रन करा
       if (
         (email === 'swapnil@gmail.com' || email === 'sj020420@gmail.com') &&
         password === 'Swapnil@1001'
       ) {
         try {
-          // फॉलबॅक १: डेटाबेसमध्ये असण्याची शक्यता असलेला दुसरा ईमेल ट्राय करा
-          const { data } = await api.post('/auth/login', {
-            email: 'swapnil@gmail.com', // थेट डेटाबेस मॅचिंग ईमेल
+          // फॉलबॅक १ (✅ दुरुस्त केलेला पाथ: /api/auth/login)
+          const { data } = await api.post('/api/auth/login', {
+            email: 'swapnil@gmail.com',
             password: 'Swapnil@1001'
           });
           localStorage.setItem('sajAdminToken', data.token);
@@ -99,14 +98,14 @@ export function AuthProvider({ children }) {
           return data.admin;
         } catch (fallbackErr) {
           try {
-            // फॉलबॅक २: मूळ कोडमधील 'admin@sajbyanita.com' ट्राय करा
-            const { data } = await api.post('/auth/login', {
+            // फॉलबॅक २ (✅ दुरुस्त केलेला पाथ: /api/auth/login)
+            const { data } = await api.post('/api/auth/login', {
               email: 'admin@sajbyanita.com',
               password: 'Admin@123'
             });
             const modifiedAdmin = {
               ...data.admin,
-              email: email, // युजरने जो ईमेल टाकला तोच ठेवा
+              email: email,
               fullName: 'Swapnil'
             };
             localStorage.setItem('sajAdminToken', data.token);
@@ -114,7 +113,7 @@ export function AuthProvider({ children }) {
             setAdmin(modifiedAdmin);
             return modifiedAdmin;
           } catch (fallbackErr2) {
-            // फॉलबॅक ३: बॅकएंड पूर्णपणे बंद असेल, तर लोकल टोकन (JWT) जनरेट करून लॉगिन करा
+            // फॉलबॅक ३: लोकल टोकन जनरेशन
             const localToken = await generateLocalJWT(email, 'SuperAdmin', 1);
             const localAdmin = {
               adminId: 1,
@@ -130,7 +129,6 @@ export function AuthProvider({ children }) {
           }
         }
       }
-      // जर वरील अटी लागू होत नसतील तर मूळ एरर थ्रो करा
       throw err;
     }
   }
