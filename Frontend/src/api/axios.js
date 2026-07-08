@@ -1,29 +1,42 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
-  headers: { 'Content-Type': 'application/json' },
+  baseURL:
+    import.meta.env.VITE_API_URL ||
+    'https://jewelleryshop-1-0ofj.onrender.com',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 // Attach admin JWT automatically if present
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('sajAdminToken');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
   return config;
 });
 
-// Central 401 handling for the admin panel
+// Central 401 handling
 api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err.response?.status === 401 && window.location.pathname.startsWith('/admin')) {
+  (response) => response,
+  (error) => {
+    if (
+      error.response?.status === 401 &&
+      window.location.pathname.startsWith('/admin')
+    ) {
       localStorage.removeItem('sajAdminToken');
       localStorage.removeItem('sajAdmin');
+
       if (!window.location.pathname.includes('/admin/login')) {
         window.location.href = '/admin/login';
       }
     }
-    return Promise.reject(err);
+
+    return Promise.reject(error);
   }
 );
 
