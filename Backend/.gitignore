@@ -1,8 +1,0 @@
-node_modules
-.env
-uploads/products/*
-uploads/banners/*
-uploads/settings/*
-!uploads/products/.gitkeep
-!uploads/banners/.gitkeep
-!uploads/settings/.gitkeep
