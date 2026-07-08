@@ -1,9 +1,14 @@
 import axios from 'axios';
 
+// Falls back to the Render backend if VITE_API_URL isn't set.
+// IMPORTANT: in Vercel's project settings, VITE_API_URL must be either
+// unset, or set to exactly https://jewelleryshop-1-0ofj.onrender.com
+// (no trailing slash, no "/api" in it — "/api" is appended below).
+const API_ROOT =
+  (import.meta.env.VITE_API_URL || 'https://jewelleryshop-1-0ofj.onrender.com').replace(/\/$/, '');
+
 const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_URL ||
-    'https://jewelleryshop-1-0ofj.onrender.com',
+  baseURL: `${API_ROOT}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
