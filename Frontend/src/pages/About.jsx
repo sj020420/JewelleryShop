@@ -1,5 +1,9 @@
 import { FaGem, FaAward, FaUsers } from 'react-icons/fa';
 
+
+
+
+
 export default function About() {
   return (
     <div>
