@@ -50,6 +50,21 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Fallback for missing uploads (e.g. on ephemeral filesystems)
+app.use('/uploads', (req, res, next) => {
+  console.warn(`[Warning] Image file is missing: ${req.originalUrl}`);
+
+  // Return a 1x1 transparent PNG placeholder with 200 OK
+  const placeholderBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+  const buffer = Buffer.from(placeholderBase64, 'base64');
+
+  res.writeHead(200, {
+    'Content-Type': 'image/png',
+    'Content-Length': buffer.length
+  });
+  res.end(buffer);
+});
+
 // ============================
 // Health Check
 // ============================
