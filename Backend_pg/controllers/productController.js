@@ -116,7 +116,7 @@ async function getProductBySlug(req, res, next) {
     );
 
     // increment view count (fire and forget)
-    pool.query('UPDATE "Products" SET "ViewCount" = "ViewCount" + 1 WHERE "ProductId" = $1', [product.ProductId]).catch(() => {});
+    pool.query('UPDATE "Products" SET "ViewCount" = "ViewCount" + 1 WHERE "ProductId" = $1', [product.ProductId]).catch(() => { });
 
     res.json({ success: true, data: { ...product, images, similarProducts: similar } });
   } catch (err) {
@@ -134,14 +134,6 @@ async function createProduct(req, res, next) {
 
     if (!jewelleryNumber || !nameEn || !categoryId || !price || !weight || !purity) {
       throw new ApiError(400, 'jewelleryNumber, nameEn, categoryId, price, weight and purity are required.');
-    }
-
-    const { rows: catRows } = await pool.query(
-      'SELECT * FROM "Categories" WHERE "CategoryId" = $1 AND "IsActive" = true',
-      [parseInt(categoryId, 10)]
-    );
-    if (!catRows[0]) {
-      throw new ApiError(400, 'Selected category does not exist or is inactive.');
     }
 
     const slug = slugify(nameEn, { lower: true, strict: true }) + '-' + Date.now().toString().slice(-5);
@@ -188,15 +180,6 @@ async function updateProduct(req, res, next) {
 
     const b = req.body;
     const val = (key, fallback) => (b[key] !== undefined && b[key] !== '' ? b[key] : fallback);
-
-    const categoryId = val('categoryId', existing.CategoryId);
-    const { rows: catRows } = await pool.query(
-      'SELECT * FROM "Categories" WHERE "CategoryId" = $1 AND "IsActive" = true',
-      [parseInt(categoryId, 10)]
-    );
-    if (!catRows[0]) {
-      throw new ApiError(400, 'Selected category does not exist or is inactive.');
-    }
 
     await pool.query(
       `UPDATE "Products" SET
@@ -247,7 +230,7 @@ async function deleteProduct(req, res, next) {
 
     images.forEach((img) => {
       const filePath = path.join(__dirname, '..', img.ImageUrl.replace('/uploads', 'uploads'));
-      fs.unlink(filePath, () => {});
+      fs.unlink(filePath, () => { });
     });
 
     res.json({ success: true, message: 'Product deleted successfully.' });
@@ -265,7 +248,7 @@ async function deleteProductImage(req, res, next) {
     await pool.query('DELETE FROM "ProductImages" WHERE "ImageId" = $1', [req.params.imageId]);
 
     const filePath = path.join(__dirname, '..', rows[0].ImageUrl.replace('/uploads', 'uploads'));
-    fs.unlink(filePath, () => {});
+    fs.unlink(filePath, () => { });
 
     res.json({ success: true, message: 'Image deleted successfully.' });
   } catch (err) {

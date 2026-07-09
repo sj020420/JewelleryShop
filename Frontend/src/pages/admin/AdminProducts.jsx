@@ -29,7 +29,7 @@ export default function AdminProducts() {
     setLoadingCategories(true);
     setCategoriesError(null);
     try {
-      const { data } = await api.get(`/categories?t=${Date.now()}`);
+      const { data } = await api.get('/categories');
       const activeCategories = (data.data || []).filter((c) => c.IsActive);
       setCategories(activeCategories);
     } catch (err) {
@@ -53,7 +53,6 @@ export default function AdminProducts() {
     setEditing(null);
     setForm(emptyForm);
     setImages([]);
-    loadCategories();
     setModalOpen(true);
   }
 
@@ -66,7 +65,6 @@ export default function AdminProducts() {
       descriptionEn: p.DescriptionEn || '',
     });
     setImages([]);
-    loadCategories();
     setModalOpen(true);
   }
 
