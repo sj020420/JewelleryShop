@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
-import api from '../../api/axios';
+import api, { getImageUrl } from '../../api/axios';
 
 const emptyForm = {
   jewelleryNumber: '', nameEn: '', nameMr: '', categoryId: '', price: '', weight: '',
@@ -144,7 +144,7 @@ export default function AdminProducts() {
               <tr key={p.ProductId} className="border-t border-gold/10">
                 <td className="p-4">
                   <div className="w-10 h-10 rounded-lg bg-ivory overflow-hidden">
-                    {p.PrimaryImage && <img src={p.PrimaryImage} alt="" className="w-full h-full object-cover" />}
+                    {p.PrimaryImage && <img src={getImageUrl(p.PrimaryImage)} alt="" className="w-full h-full object-cover" />}
                   </div>
                 </td>
                 <td className="p-4">

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FaHeart, FaRegHeart, FaWhatsapp, FaShareAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import api from '../api/axios';
+import api, { getImageUrl } from '../api/axios';
 import ProductCard from '../components/ProductCard';
 import { useWishlist } from '../context/WishlistContext';
 import { useLang } from '../context/LangContext';
@@ -66,7 +66,7 @@ export default function ProductDetails() {
           >
             {images[activeImage]?.ImageUrl ? (
               <img
-                src={images[activeImage].ImageUrl}
+                src={getImageUrl(images[activeImage].ImageUrl)}
                 alt={product.NameEn}
                 className={`w-full h-full object-cover transition-transform duration-300 ${zoom ? 'scale-150' : 'scale-100'}`}
               />
@@ -82,7 +82,7 @@ export default function ProductDetails() {
                   onClick={() => setActiveImage(i)}
                   className={`w-16 h-16 rounded-lg overflow-hidden border-2 flex-shrink-0 ${i === activeImage ? 'border-gold' : 'border-transparent'}`}
                 >
-                  {img.ImageUrl && <img src={img.ImageUrl} alt="" className="w-full h-full object-cover" />}
+                  {img.ImageUrl && <img src={getImageUrl(img.ImageUrl)} alt="" className="w-full h-full object-cover" />}
                 </button>
               ))}
             </div>

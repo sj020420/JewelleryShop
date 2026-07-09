@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { pool } = require('../config/db');
 const { ApiError } = require('../middleware/errorHandler');
+const { uploadToCloudinary, deleteFromCloudinary } = require('../utils/cloudinary');
 
 // GET /api/products
 // Supports: page, limit, search, category, minPrice, maxPrice, purity,
@@ -157,9 +158,12 @@ async function createProduct(req, res, next) {
     if (req.files && req.files.length) {
       for (let idx = 0; idx < req.files.length; idx++) {
         const file = req.files[idx];
+        const cloudinaryUrl = await uploadToCloudinary(file.path, 'products');
+        const imageUrl = cloudinaryUrl || `/uploads/products/${file.filename}`;
+
         await pool.query(
           'INSERT INTO "ProductImages" ("ProductId", "ImageUrl", "IsPrimary", "DisplayOrder") VALUES ($1, $2, $3, $4)',
-          [productId, `/uploads/products/${file.filename}`, idx === 0, idx]
+          [productId, imageUrl, idx === 0, idx]
         );
       }
     }
@@ -207,9 +211,12 @@ async function updateProduct(req, res, next) {
     if (req.files && req.files.length) {
       for (let idx = 0; idx < req.files.length; idx++) {
         const file = req.files[idx];
+        const cloudinaryUrl = await uploadToCloudinary(file.path, 'products');
+        const imageUrl = cloudinaryUrl || `/uploads/products/${file.filename}`;
+
         await pool.query(
           'INSERT INTO "ProductImages" ("ProductId", "ImageUrl", "IsPrimary", "DisplayOrder") VALUES ($1, $2, $3, $4)',
-          [req.params.id, `/uploads/products/${file.filename}`, false, idx]
+          [req.params.id, imageUrl, false, idx]
         );
       }
     }
@@ -228,10 +235,14 @@ async function deleteProduct(req, res, next) {
 
     await pool.query('DELETE FROM "Products" WHERE "ProductId" = $1', [req.params.id]); // ProductImages cascade
 
-    images.forEach((img) => {
-      const filePath = path.join(__dirname, '..', img.ImageUrl.replace('/uploads', 'uploads'));
-      fs.unlink(filePath, () => { });
-    });
+    for (const img of images) {
+      if (img.ImageUrl.includes('cloudinary.com')) {
+        await deleteFromCloudinary(img.ImageUrl);
+      } else {
+        const filePath = path.join(__dirname, '..', img.ImageUrl.replace('/uploads', 'uploads'));
+        fs.unlink(filePath, () => {});
+      }
+    }
 
     res.json({ success: true, message: 'Product deleted successfully.' });
   } catch (err) {
@@ -247,8 +258,12 @@ async function deleteProductImage(req, res, next) {
 
     await pool.query('DELETE FROM "ProductImages" WHERE "ImageId" = $1', [req.params.imageId]);
 
-    const filePath = path.join(__dirname, '..', rows[0].ImageUrl.replace('/uploads', 'uploads'));
-    fs.unlink(filePath, () => { });
+    if (rows[0].ImageUrl.includes('cloudinary.com')) {
+      await deleteFromCloudinary(rows[0].ImageUrl);
+    } else {
+      const filePath = path.join(__dirname, '..', rows[0].ImageUrl.replace('/uploads', 'uploads'));
+      fs.unlink(filePath, () => {});
+    }
 
     res.json({ success: true, message: 'Image deleted successfully.' });
   } catch (err) {

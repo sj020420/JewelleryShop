@@ -3,6 +3,7 @@ import { FaHeart, FaRegHeart, FaShareAlt, FaWhatsapp } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { useWishlist } from '../context/WishlistContext';
 import { useLang } from '../context/LangContext';
+import { getImageUrl } from '../api/axios';
 
 export default function ProductCard({ product }) {
   const { t } = useLang();
@@ -42,7 +43,7 @@ export default function ProductCard({ product }) {
       <Link to={`/products/${product.Slug}`} className="block relative aspect-square overflow-hidden bg-ivory">
         {product.PrimaryImage ? (
           <img
-            src={product.PrimaryImage}
+            src={getImageUrl(product.PrimaryImage)}
             alt={product.NameEn}
             loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

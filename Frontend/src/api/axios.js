@@ -45,4 +45,10 @@ api.interceptors.response.use(
   }
 );
 
+export function getImageUrl(path) {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  return `${API_ROOT}${path}`;
+}
+
 export default api;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FaGem, FaTags, FaBoxes, FaExclamationTriangle, FaStar, FaEye, FaEnvelope, FaClock } from 'react-icons/fa';
-import api from '../../api/axios';
+import api, { getImageUrl } from '../../api/axios';
 
 const cards = [
   { key: 'TotalProducts', label: 'Total Products', icon: FaGem },
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
             {summary?.recentProducts?.map((p) => (
               <div key={p.ProductId} className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-ivory overflow-hidden flex-shrink-0">
-                  {p.PrimaryImage && <img src={p.PrimaryImage} alt="" className="w-full h-full object-cover" />}
+                  {p.PrimaryImage && <img src={getImageUrl(p.PrimaryImage)} alt="" className="w-full h-full object-cover" />}
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-ink">{p.NameEn}</p>

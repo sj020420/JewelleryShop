@@ -1,4 +1,5 @@
 const { pool } = require('../config/db');
+const { uploadToCloudinary } = require('../utils/cloudinary');
 
 // GET /api/settings  (public)
 async function getSettings(req, res, next) {
@@ -18,7 +19,11 @@ async function updateSettings(req, res, next) {
     const b = req.body;
     const val = (key, fallback) => (b[key] !== undefined ? b[key] : fallback);
 
-    const logoUrl = req.file ? `/uploads/settings/${req.file.filename}` : val('logoUrl', existing?.LogoUrl);
+    let logoUrl = val('logoUrl', existing?.LogoUrl);
+    if (req.file) {
+      const cloudinaryUrl = await uploadToCloudinary(req.file.path, 'settings');
+      logoUrl = cloudinaryUrl || `/uploads/settings/${req.file.filename}`;
+    }
 
     if (existing) {
       await pool.query(
