@@ -136,6 +136,14 @@ async function createProduct(req, res, next) {
       throw new ApiError(400, 'jewelleryNumber, nameEn, categoryId, price, weight and purity are required.');
     }
 
+    const { rows: catRows } = await pool.query(
+      'SELECT * FROM "Categories" WHERE "CategoryId" = $1 AND "IsActive" = true',
+      [parseInt(categoryId, 10)]
+    );
+    if (!catRows[0]) {
+      throw new ApiError(400, 'Selected category does not exist or is inactive.');
+    }
+
     const slug = slugify(nameEn, { lower: true, strict: true }) + '-' + Date.now().toString().slice(-5);
 
     const { rows: inserted } = await pool.query(
@@ -180,6 +188,15 @@ async function updateProduct(req, res, next) {
 
     const b = req.body;
     const val = (key, fallback) => (b[key] !== undefined && b[key] !== '' ? b[key] : fallback);
+
+    const categoryId = val('categoryId', existing.CategoryId);
+    const { rows: catRows } = await pool.query(
+      'SELECT * FROM "Categories" WHERE "CategoryId" = $1 AND "IsActive" = true',
+      [parseInt(categoryId, 10)]
+    );
+    if (!catRows[0]) {
+      throw new ApiError(400, 'Selected category does not exist or is inactive.');
+    }
 
     await pool.query(
       `UPDATE "Products" SET

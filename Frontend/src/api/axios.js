@@ -5,7 +5,8 @@ import axios from 'axios';
 // unset, or set to exactly https://jewelleryshop-1-0ofj.onrender.com
 // (no trailing slash, no "/api" in it — "/api" is appended below).
 const API_ROOT =
-  (import.meta.env.VITE_API_URL || 'https://jewelleryshop-1-0ofj.onrender.com').replace(/\/$/, '');
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? '' : 'https://jewelleryshop-1-0ofj.onrender.com');
 
 const api = axios.create({
   baseURL: `${API_ROOT}/api`,
