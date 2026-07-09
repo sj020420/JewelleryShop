@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const path = require('path');
 
 const { testConnection } = require('./config/db');
+const { seedAdmin } = require('./utils/seedAdmin');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const authRoutes = require('./routes/authRoutes');
@@ -112,6 +113,7 @@ const PORT = process.env.PORT || 5000;
 async function start() {
   try {
     await testConnection();
+    await seedAdmin();
 
     app.listen(PORT, () => {
       console.log(`🚀 Saj by Anita Jewellery API running on port ${PORT}`);
