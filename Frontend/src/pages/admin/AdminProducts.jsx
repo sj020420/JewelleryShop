@@ -3,22 +3,6 @@ import { toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
 import api from '../../api/axios';
 
-const requiredNames = [
-  'Jewellery Collection',
-  'Gold Jewellery',
-  'Diamond Jewellery',
-  'Jewellery Shop',
-  'Handmade Jewellery'
-];
-
-const categoryMap = {
-  1: 'Jewellery Collection',
-  2: 'Gold Jewellery',
-  3: 'Diamond Jewellery',
-  4: 'Jewellery Shop',
-  5: 'Handmade Jewellery'
-};
-
 const emptyForm = {
   jewelleryNumber: '', nameEn: '', nameMr: '', categoryId: '', price: '', weight: '',
   purity: '1 Gram', quantity: 0, isFeatured: false, isBestSelling: false, descriptionEn: '',
@@ -27,6 +11,8 @@ const emptyForm = {
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [categoriesError, setCategoriesError] = useState(null);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -39,40 +25,29 @@ export default function AdminProducts() {
     setProducts(data.data);
   }
 
-  async function ensureCategories() {
+  async function loadCategories() {
+    setLoadingCategories(true);
+    setCategoriesError(null);
     try {
       const { data } = await api.get('/categories');
-      const existing = data.data || [];
-      const updatedCategories = [...existing];
-
-      for (const name of requiredNames) {
-        const found = existing.find(c => c.NameEn === name);
-        if (!found) {
-          try {
-            const res = await api.post('/categories', {
-              nameEn: name,
-              nameMr: '',
-              description: `${name} category`,
-              displayOrder: 0
-            });
-            if (res.data && res.data.data) {
-              updatedCategories.push(res.data.data);
-            }
-          } catch (postErr) {
-            console.error(`Failed to create category ${name}:`, postErr);
-          }
-        }
-      }
-      setCategories(updatedCategories);
+      const activeCategories = (data.data || []).filter((c) => c.IsActive);
+      setCategories(activeCategories);
     } catch (err) {
-      console.error('Failed to ensure categories:', err);
+      console.error('Failed to load categories:', err);
+      setCategoriesError('Failed to load categories');
+      toast.error('Failed to load categories');
+    } finally {
+      setLoadingCategories(false);
     }
   }
 
   useEffect(() => {
     loadProducts();
-    ensureCategories();
   }, [search]);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
 
   function openAdd() {
     setEditing(null);
@@ -176,7 +151,7 @@ export default function AdminProducts() {
                   <p className="font-medium text-ink">{p.NameEn}</p>
                   <p className="text-xs text-ink/40">{p.JewelleryNumber}</p>
                 </td>
-                <td className="p-4">{categoryMap[p.CategoryId] || p.CategoryName}</td>
+                <td className="p-4">{p.CategoryName || 'N/A'}</td>
                 <td className="p-4">₹{Number(p.Price).toLocaleString('en-IN')}</td>
                 <td className="p-4">{p.Quantity}</td>
                 <td className="p-4">{p.IsFeatured ? 'Yes' : 'No'}</td>
@@ -216,13 +191,17 @@ export default function AdminProducts() {
                 onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
                 className="w-full border border-gold/25 rounded-lg px-3 py-2 text-sm">
                 <option value="">Select Category</option>
-                {categories
-                  .filter((c) => requiredNames.includes(c.NameEn))
-                  .map((c) => (
+                {loadingCategories ? (
+                  <option disabled>Loading categories...</option>
+                ) : categoriesError ? (
+                  <option disabled>{categoriesError}</option>
+                ) : (
+                  categories.map((c) => (
                     <option key={c.CategoryId} value={c.CategoryId}>
                       {c.NameEn}
                     </option>
-                  ))}
+                  ))
+                )}
               </select>
               <div className="grid grid-cols-2 gap-3">
                 <input required type="number" placeholder="Price" value={form.price}

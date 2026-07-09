@@ -24,10 +24,12 @@ async function getSummary(req, res, next) {
     `);
 
     const { rows: recentRows } = await pool.query(`
-      SELECT p.*,
+      SELECT p.*, c."NameEn" AS "CategoryName", c."Slug" AS "CategorySlug",
         (SELECT "ImageUrl" FROM "ProductImages" pi WHERE pi."ProductId" = p."ProductId"
           ORDER BY pi."IsPrimary" DESC LIMIT 1) AS "PrimaryImage"
-      FROM "Products" p ORDER BY p."CreatedAt" DESC LIMIT 5
+      FROM "Products" p
+      INNER JOIN "Categories" c ON p."CategoryId" = c."CategoryId"
+      ORDER BY p."CreatedAt" DESC LIMIT 5
     `);
 
     // COUNT()/SUM() come back as strings from pg (bigint/numeric) — normalize to numbers

@@ -5,11 +5,12 @@ const { ApiError } = require('../middleware/errorHandler');
 async function getWishlist(req, res, next) {
   try {
     const { rows } = await pool.query(
-      `SELECT w."WishlistId", p.*,
+      `SELECT w."WishlistId", p.*, c."NameEn" AS "CategoryName", c."Slug" AS "CategorySlug",
         (SELECT "ImageUrl" FROM "ProductImages" pi WHERE pi."ProductId" = p."ProductId"
           ORDER BY pi."IsPrimary" DESC LIMIT 1) AS "PrimaryImage"
        FROM "Wishlist" w
        INNER JOIN "Products" p ON w."ProductId" = p."ProductId"
+       INNER JOIN "Categories" c ON p."CategoryId" = c."CategoryId"
        WHERE w."DeviceToken" = $1
        ORDER BY w."CreatedAt" DESC`,
       [req.params.deviceToken]

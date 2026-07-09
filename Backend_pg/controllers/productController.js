@@ -144,7 +144,7 @@ async function createProduct(req, res, next) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
        RETURNING "ProductId"`,
       [
-        jewelleryNumber, nameEn, nameMr || null, slug, categoryId, price, weight, purity,
+        jewelleryNumber, nameEn, nameMr || null, slug, parseInt(categoryId, 10), price, weight, purity,
         quantity || 0,
         isFeatured === 'true' || isFeatured === true,
         isBestSelling === 'true' || isBestSelling === true,
@@ -190,7 +190,7 @@ async function updateProduct(req, res, next) {
         val('jewelleryNumber', existing.JewelleryNumber),
         val('nameEn', existing.NameEn),
         val('nameMr', existing.NameMr),
-        val('categoryId', existing.CategoryId),
+        parseInt(val('categoryId', existing.CategoryId), 10),
         val('price', existing.Price),
         val('weight', existing.Weight),
         val('purity', existing.Purity),
